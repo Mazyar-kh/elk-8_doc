@@ -1,0 +1,5 @@
+After initiating the initial node with minimal configuration, the next step involves generating an enrollment token using the elasticsearch-create-enrollment-token utility provided by Elasticsearch. This token serves as a means of authentication during the enrollment process.
+
+Once the token is generated, it needs to be distributed to the remaining nodes without initiating them. This can be achieved by accessing the Elasticsearch binaries on each node and providing the generated token. Subsequently, adjustments to the configuration files of these nodes are necessary, including changes to the node name, network host, and other relevant settings.
+
+Upon completing the configuration adjustments, the second and third nodes can be initiated. This sequential approach ensures that each node is appropriately configured and authenticated before joining the Elasticsearch cluster, thereby contributing to the establishment of a robust and functional distributed system.
