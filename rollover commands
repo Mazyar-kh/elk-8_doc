@@ -1,0 +1,70 @@
+# Define an index lifecycle management (ILM) policy named "main-policy" with specified phases and actions.
+PUT /_ilm/policy/main-policy
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "min_age": "10m",      // New: Minimum age before transitioning to warm phase
+        "actions": {
+          "rollover": {
+            "max_age": "30m",  // New: Maximum age for rollover
+            "max_size": "1mb"  // New: Maximum size for rollover
+          }
+        }
+      },
+      "warm": {
+        "min_age": "30m",      // New: Minimum age before transitioning to delete phase
+        "actions": {
+          "set_priority": { "priority": 50 } // New: Lower priority for warm indices
+        }
+      },
+      "delete": {
+        "min_age": "2h",       // New: Minimum age before deletion
+        "actions": {
+          "delete": {}         // Same: Delete action
+        }
+      }
+    }
+  }
+}
+
+# Define an index template named "main-temp" for data streams matching the pattern "main-*".
+PUT _index_template/main-temp
+{
+  "index_patterns": [
+    "main-*"
+  ],
+  "data_stream": {},
+  "priority": 300,
+  "template": {
+    "settings": {
+      "index.lifecycle.name": "main-policy"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date_nanos"
+        },
+        "message": {
+          "type": "text"
+        }
+        // Add mappings for other fields as needed
+      }
+    }
+  }
+}
+
+# Create a data stream named "main-1".
+PUT /_data_stream/main-1
+
+# Retrieve information about the "main-1" data stream.
+GET /_data_stream/main-1
+
+# Explain the index lifecycle management (ILM) policy for the index ".ds-main-1-2024.03.17-000001".
+GET /_ilm/explain/.ds-main-1-2024.03.17-000001
+
+# Explain the index lifecycle management (ILM) policy for the "main-1" data stream.
+GET main-1/_ilm/explain
+
+# Explain the index lifecycle management (ILM) policy for the index ".ds-main-1-2024.03.17-000002".
+GET /.ds-main-1-2024.03.17-000002/_ilm/explain
